@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {AngularFire } from 'angularfire2';
 
 @Component({
@@ -7,13 +7,16 @@ import {AngularFire } from 'angularfire2';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+
   title = 'app works!';
   cuisines;
 
-  constructor(_angularFire: AngularFire){
-    _angularFire.database.list('/cuisines')
-      .subscribe(retrievedCuisines => {
-        this.cuisines = retrievedCuisines;
-      });
+  constructor(private _angularFire: AngularFire){
+
   };
+
+  ngOnInit() {
+    this.cuisines = this._angularFire.database.list('/cuisines');
+  };
+
 }
