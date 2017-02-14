@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import {AngularFire, FirebaseListObservable } from 'angularfire2';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 @Component({
   selector: 'app-root',
@@ -8,9 +10,8 @@ import {AngularFire, FirebaseListObservable } from 'angularfire2';
 })
 export class AppComponent {
 
-  title = 'app works!';
   cuisines: FirebaseListObservable<any[]>;
-  restaurant;
+  restaurants: Observable<any[]>;
 
   constructor(private _angularFire: AngularFire){
 
@@ -18,20 +19,15 @@ export class AppComponent {
 
   ngOnInit() {
     this.cuisines = this._angularFire.database.list('/cuisines');
-    this.restaurant = this._angularFire.database.object('/restaurant');
+    this.restaurants = this._angularFire.database.list('/restaurants')
+      .map(restaurants => {
+        console.log('BEFORE MAP', restaurants);
+        restaurants.map(restaurant => {
+          restaurant.cuisineType = this._angularFire.database.object('/cuisines/' + restaurant.cuisine);
+        });
+        console.log("AFTER MAP", restaurants);
+        return restaurants
+      });
   };
-
-  add()  {
-    this.cuisines.push({
-      name: 'Asian'
-    });
-  };
-
-  update() {
-    this._angularFire.database.object('/restaurant').update({
-      name: 'New Name',
-      rating: 5
-    })
-  }
 
 }
